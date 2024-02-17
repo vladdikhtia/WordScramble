@@ -21,13 +21,11 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            
             List {
                 Section {
                     TextField("Enter your word", text: $newWord)
                         .textInputAutocapitalization(.never)
                 }
-                
                 Section {
                     ForEach(usedWords, id: \.self) { word in
                         HStack{
@@ -37,7 +35,6 @@ struct ContentView: View {
                     }
                 }
             }
-            
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
@@ -72,10 +69,7 @@ struct ContentView: View {
             } message: {
                 Text(errorMessage)
             }
-            
         }
-        
-        
         
     }
     
@@ -104,13 +98,10 @@ struct ContentView: View {
             return
         }
         
-        
         withAnimation {
             usedWords.insert(answer, at: 0) // add to the start of the list
             score += 1
         }
-        
-        
         //        usedWords.append(answer) // add to the end of the list
         newWord = ""
     }
@@ -153,7 +144,6 @@ struct ContentView: View {
                 return false
             }
         }
-        
         return true
     }
     
@@ -163,7 +153,6 @@ struct ContentView: View {
         let range = NSRange(location: 0, length: word.utf16.count)
         
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
-        
         return misspelledRange.location == NSNotFound
     }
     
@@ -171,7 +160,6 @@ struct ContentView: View {
         if newWord == rootWord || newWord.count < 3 {
            return false
         }
-        
         return true
     }
     
