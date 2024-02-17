@@ -17,8 +17,11 @@ struct ContentView: View {
     @State private var errorMessage = ""
     @State private var showingError = false
     
+    @State private var score = 0
+    
     var body: some View {
         NavigationStack {
+            
             List {
                 Section {
                     TextField("Enter your word", text: $newWord)
@@ -34,11 +37,24 @@ struct ContentView: View {
                     }
                 }
             }
-            .toolbar(content: {
-                Button("New Game") {
-                    startGame()
+            
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Text("Your score is: \(score)")
+                        
+                        Button(action: {
+                            startGame()
+                        }) {
+                            Label("Start New Game", systemImage: "gamecontroller")
+                        }
+                        
+                    }
+                    label: {
+                        Label("Add", systemImage: "list.bullet")
+                    }
                 }
-            })
+            }
             .navigationTitle(rootWord)
             .onSubmit {
                 addNewWord()
@@ -47,12 +63,19 @@ struct ContentView: View {
                 startGame()
             })
             .alert(errorTitle, isPresented: $showingError) {
-                Button("OK") { }
+                Button("OK") {
+                    withAnimation{
+                        newWord = ""
+                    }
+                    
+                }
             } message: {
                 Text(errorMessage)
             }
-
+            
         }
+        
+        
         
     }
     
@@ -76,14 +99,19 @@ struct ContentView: View {
             wordError(title: "Word not recognized", message: "You can't just make them up, you know!")
             return
         }
+        guard isValid(word: answer) else {
+            wordError(title: "Write another word", message: "You can't just write the same word, or write word with more than 2 letters.")
+            return
+        }
         
         
         withAnimation {
             usedWords.insert(answer, at: 0) // add to the start of the list
+            score += 1
         }
         
         
-//        usedWords.append(answer) // add to the end of the list
+        //        usedWords.append(answer) // add to the end of the list
         newWord = ""
     }
     
@@ -100,6 +128,7 @@ struct ContentView: View {
                 withAnimation{
                     usedWords = []
                     newWord = ""
+                    score = 0
                 }
                 // If we are here everything has worked, so we can exit
                 return
@@ -136,6 +165,14 @@ struct ContentView: View {
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         
         return misspelledRange.location == NSNotFound
+    }
+    
+    func isValid(word: String) -> Bool {
+        if newWord == rootWord || newWord.count < 3 {
+           return false
+        }
+        
+        return true
     }
     
     func wordError(title: String, message: String){
